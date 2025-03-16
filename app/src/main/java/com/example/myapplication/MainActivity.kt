@@ -9,14 +9,19 @@ import net.objecthunter.exp4j.ExpressionBuilder
 
 class MainActivity : AppCompatActivity() {
     private lateinit var resultTextView: TextView
+    private lateinit var expressionTextView: TextView
     private var currentInput = StringBuilder()
     private var lastResult = ""
+    private var isNewCalculation = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         resultTextView = findViewById(R.id.resultTextView)
+        expressionTextView = findViewById(R.id.expressionTextView)
+
+        expressionTextView.text = ""
 
         // Number buttons
         setupButton(R.id.button0, "0")
@@ -41,7 +46,9 @@ class MainActivity : AppCompatActivity() {
         val buttonClear = findViewById<Button>(R.id.buttonClear)
         buttonClear.setOnClickListener {
             currentInput.clear()
-            updateDisplay()
+            isNewCalculation = true
+            expressionTextView.text = ""
+            resultTextView.text = "0"
         }
 
         val buttonClearEntry = findViewById<Button>(R.id.buttonClearEntry)
@@ -74,38 +81,67 @@ class MainActivity : AppCompatActivity() {
 
         val buttonEquals = findViewById<Button>(R.id.buttonEquals)
         buttonEquals.setOnClickListener {
-            try {
-                val expression = currentInput.toString()
-                    .replace("×", "*")
-                    .replace("÷", "/")
-
-                val result = ExpressionBuilder(expression).build().evaluate()
-
-                // Format result to avoid unnecessary decimal places
-                lastResult = if (result == result.toLong().toDouble()) {
-                    result.toLong().toString()
-                } else {
-                    result.toString()
-                }
-
-                currentInput.clear()
-                currentInput.append(lastResult)
-                updateDisplay()
-            } catch (e: Exception) {
-                resultTextView.text = "Error"
-            }
+            calculateResult()
         }
     }
 
     private fun setupButton(buttonId: Int, value: String) {
         val button = findViewById<Button>(buttonId)
         button.setOnClickListener {
+            if (isNewCalculation && (value == "+" || value == "-" || value == "×" || value == "÷")) {
+                currentInput.append(lastResult)
+                isNewCalculation = false
+            } else if (isNewCalculation) {
+                currentInput.clear()
+                isNewCalculation = false
+            }
             currentInput.append(value)
             updateDisplay()
         }
     }
 
     private fun updateDisplay() {
-        resultTextView.text = if (currentInput.isEmpty()) "0" else currentInput.toString()
+        // Hiển thị dữ liệu hiện tại trong resultTextView
+        if (currentInput.isEmpty()) {
+            expressionTextView.text = ""
+            resultTextView.text = "0"
+        } else {
+            resultTextView.text = currentInput.toString()
+        }
+    }
+
+    private fun calculateResult() {
+        try {
+            if (currentInput.isEmpty()) return
+
+            val expression = currentInput.toString()
+                .replace("×", "*")
+                .replace("÷", "/")
+
+            val expressionToShow = currentInput.toString() + " ="
+
+            val result = ExpressionBuilder(expression).build().evaluate()
+
+            // Format result to avoid unnecessary decimal places
+            lastResult = if (result == result.toLong().toDouble()) {
+                result.toLong().toString()
+            } else {
+                result.toString()
+            }
+
+            // Hiển thị biểu thức và kết quả
+            expressionTextView.text = expressionToShow
+            resultTextView.text = lastResult
+
+            // Clear the current input but keep the result for potential further calculations
+            currentInput.clear()
+            isNewCalculation = true
+
+        } catch (e: Exception) {
+            expressionTextView.text = ""
+            resultTextView.text = "Error"
+            currentInput.clear()
+            isNewCalculation = true
+        }
     }
 }

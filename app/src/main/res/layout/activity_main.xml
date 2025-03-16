@@ -6,18 +6,34 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/resultTextView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="413dp"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#EEEEEE"
-        android:gravity="center_vertical|end"
-        android:padding="16dp"
-        android:text="0"
-        android:textColor="#000000"
-        android:textSize="36sp"
-        android:textStyle="bold" />
+        android:background="#F5F5F5"
+        android:orientation="vertical"
+        android:gravity="end|bottom"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/expressionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="24sp"
+            android:textColor="#555555"
+            android:layout_marginBottom="8dp"
+            android:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/resultTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="60sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+    </LinearLayout>
 
     <GridLayout
         android:layout_width="match_parent"
